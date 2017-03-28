@@ -10,20 +10,20 @@ endif()
 
 find_package(Threads REQUIRED)
 
-set(process_source_files process.cpp)
+set(process_source_files ${CMAKE_CURRENT_SOURCE_DIR}/process.cpp)
 
 if(WIN32)
-  list(APPEND process_source_files process_win.cpp)
+  list(APPEND process_source_files ${CMAKE_CURRENT_SOURCE_DIR}/process_win.cpp)
   #If compiled using MSYS2, use sh to run commands
   if(MSYS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMSYS_PROCESS_USE_SH")
   endif()
 else()
-  list(APPEND process_source_files process_unix.cpp)
+  list(APPEND process_source_files ${CMAKE_CURRENT_SOURCE_DIR}/process_unix.cpp)
 endif()
 
-add_library(tiny-process-library ${process_source_files})
-add_executable(examples examples.cpp)
+add_library(tiny-process-library SHARED ${process_source_files})
+add_executable(examples ${CMAKE_CURRENT_SOURCE_DIR}/examples.cpp)
 
 target_link_libraries(tiny-process-library ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(examples tiny-process-library)
@@ -33,3 +33,10 @@ if(ENABLE_TESTING)
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+
+install(TARGETS tiny-process-library
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        )
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/process.hpp DESTINATION include)
