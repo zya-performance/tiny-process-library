@@ -9,7 +9,7 @@ int main() {
 
 
   cout << "Example 1a - the mandatory Hello World through an executable" << endl;
-  Process process1a("echo Hello World", "", [](const char *bytes, size_t n) {
+  TPL::Process process1a("echo Hello World", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   });
   auto exit_status=process1a.get_exit_status();
@@ -19,7 +19,7 @@ int main() {
   
 #ifndef _WIN32
   cout << endl << "Example 1b - Hello World through a function on Unix-like systems" << endl;
-  Process process1b([] {
+  TPL::Process process1b([] {
     cout << "Hello World" << endl;
     exit(0);
   }, [](const char *bytes, size_t n) {
@@ -32,7 +32,7 @@ int main() {
   
   
   cout << endl << "Example 2 - cd into a nonexistent directory" << endl;
-  Process process2("cd a_nonexistent_directory", "", [](const char *bytes, size_t n) {
+  TPL::Process process2("cd a_nonexistent_directory", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   }, [](const char *bytes, size_t n) {
     cout << "Output from stderr: " << string(bytes, n);
@@ -47,7 +47,7 @@ int main() {
   
   cout << endl << "Example 3 - async sleep process" << endl;
   thread thread3([]() {
-    Process process3("sleep 5");
+    TPL::Process process3("sleep 5");
     auto exit_status=process3.get_exit_status();
     cout << "Example 3 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
   });
@@ -56,7 +56,7 @@ int main() {
   
   
   cout << endl << "Example 4 - killing async sleep process after 5 seconds" << endl;
-  auto process4=make_shared<Process>("sleep 10");
+  auto process4=make_shared<TPL::Process>("sleep 10");
   thread thread4([process4]() {
     auto exit_status=process4->get_exit_status();
     cout << "Example 4 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
@@ -68,7 +68,7 @@ int main() {
 
 
   cout << endl << "Example 5 - multiple commands, stdout and stderr" << endl;
-  Process process5("echo Hello && ls an_incorrect_path", "", [](const char *bytes, size_t n) {
+  TPL::Process process5("echo Hello && ls an_incorrect_path", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   }, [](const char *bytes, size_t n) {
     cout << "Output from stderr: " << string(bytes, n);
@@ -82,7 +82,7 @@ int main() {
   
   
   cout << endl << "Example 6 - run bash with input from stdin" << endl;
-  Process process6("bash", "", [](const char *bytes, size_t n) {
+  TPL::Process process6("bash", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   }, nullptr, true);
   process6.write("echo Hello from bash\n");
@@ -93,7 +93,7 @@ int main() {
   
   
   cout << endl << "Example 7 - send data to cat through stdin" << endl;
-  Process process7("cat", "", [](const char *bytes, size_t n) {
+  TPL::Process process7("cat", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   }, nullptr, true);
   process7.write("Hello cat\n");
@@ -108,7 +108,7 @@ int main() {
 
 
   cout << "Example 1 - the mandatory Hello World" << endl;
-  Process process1("cmd /C echo Hello World", "", [](const char *bytes, size_t n) {
+  TPL::Process process1("cmd /C echo Hello World", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   });
   auto exit_status=process1.get_exit_status();
@@ -117,7 +117,7 @@ int main() {
   
   
   cout << endl << "Example 2 - cd into a nonexistent directory" << endl;
-  Process process2("cmd /C cd a_nonexistent_directory", "", [](const char *bytes, size_t n) {
+  TPL::Process process2("cmd /C cd a_nonexistent_directory", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   }, [](const char *bytes, size_t n) {
     cout << "Output from stderr: " << string(bytes, n);
@@ -132,7 +132,7 @@ int main() {
   
   cout << endl << "Example 3 - async sleep process" << endl;
   thread thread3([]() {
-    Process process3("timeout 5");
+    TPL::Process process3("timeout 5");
     auto exit_status=process3.get_exit_status();
     cout << "Example 3 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
   });
@@ -141,7 +141,7 @@ int main() {
   
   
   cout << endl << "Example 4 - killing async sleep process after 5 seconds" << endl;
-  auto process4=make_shared<Process>("timeout 10");
+  auto process4=make_shared<TPL::Process>("timeout 10");
   thread thread4([process4]() {
     auto exit_status=process4->get_exit_status();
     cout << "Example 4 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;

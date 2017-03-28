@@ -11,6 +11,8 @@
 #include <sys/wait.h>
 #endif
 
+
+namespace TPL {
 ///Platform independent class for creating processes
 class Process {
 public:
@@ -91,5 +93,5 @@ private:
   void async_read();
   void close_fds();
 };
-
+}
 #endif  // TINY_PROCESS_LIBRARY_HPP_

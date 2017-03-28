@@ -4,7 +4,7 @@
 #include <TlHelp32.h>
 #include <stdexcept>
 
-Process::Data::Data(): id(0), handle(NULL) {}
+TPL::Process::Data::Data(): id(0), handle(NULL) {}
 
 namespace {
   // Simple HANDLE wrapper to close it automatically from the destructor.
@@ -34,7 +34,7 @@ namespace {
 }
 
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
-Process::id_type Process::open(const string_type &command, const string_type &path) {
+TPL::Process::id_type TPL::Process::open(const string_type &command, const string_type &path) {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stdout)
@@ -125,7 +125,7 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
   return process_info.dwProcessId;
 }
 
-void Process::async_read() {
+void TPL::Process::async_read() {
   if(data.id==0)
     return;
   if(stdout_fd) {
@@ -154,7 +154,7 @@ void Process::async_read() {
   }
 }
 
-int Process::get_exit_status() {
+int TPL::Process::get_exit_status() {
   if(data.id==0)
     return -1;
   DWORD exit_status;
@@ -171,7 +171,7 @@ int Process::get_exit_status() {
   return static_cast<int>(exit_status);
 }
 
-void Process::close_fds() {
+void TPL::Process::close_fds() {
   if(stdout_thread.joinable())
     stdout_thread.join();
   if(stderr_thread.joinable())
@@ -189,7 +189,7 @@ void Process::close_fds() {
   }
 }
 
-bool Process::write(const char *bytes, size_t n) {
+bool TPL::Process::write(const char *bytes, size_t n) {
   if(!open_stdin)
     throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
 
@@ -207,7 +207,7 @@ bool Process::write(const char *bytes, size_t n) {
   return false;
 }
 
-void Process::close_stdin() {
+void TPL::Process::close_stdin() {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     if(*stdin_fd!=NULL) CloseHandle(*stdin_fd);
@@ -216,7 +216,7 @@ void Process::close_stdin() {
 }
 
 //Based on http://stackoverflow.com/a/1173396
-void Process::kill(bool force) {
+void TPL::Process::kill(bool force) {
   std::lock_guard<std::mutex> lock(close_mutex);
   if(data.id>0 && !closed) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -242,7 +242,7 @@ void Process::kill(bool force) {
 }
 
 //Based on http://stackoverflow.com/a/1173396
-void Process::kill(id_type id, bool force) {
+void TPL::Process::kill(id_type id, bool force) {
   if(id==0)
     return;
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);

@@ -4,9 +4,9 @@
 #include <signal.h>
 #include <stdexcept>
 
-Process::Data::Data(): id(-1) {}
+TPL::Process::Data::Data(): id(-1) {}
 
-Process::Process(std::function<void()> function,
+TPL::Process::Process(std::function<void()> function,
                  std::function<void (const char *, size_t)> read_stdout,
                  std::function<void (const char *, size_t)> read_stderr,
                  bool open_stdin, size_t buffer_size) :
@@ -15,7 +15,9 @@ Process::Process(std::function<void()> function,
   async_read();
 }
 
-Process::id_type Process::open(std::function<void()> function) {
+
+
+TPL::Process::id_type TPL::Process::open(std::function<void()> function) {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type);
   if(read_stdout)
@@ -81,7 +83,7 @@ Process::id_type Process::open(std::function<void()> function) {
   return pid;
 }
 
-Process::id_type Process::open(const std::string &command, const std::string &path) {
+TPL::Process::id_type TPL::Process::open(const std::string &command, const std::string &path) {
   return open([&command, &path] {
     if(!path.empty()) {
       auto path_escaped=path;
@@ -98,7 +100,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   });
 }
 
-void Process::async_read() {
+void TPL::Process::async_read() {
   if(data.id<=0)
     return;
   if(stdout_fd) {
@@ -119,7 +121,7 @@ void Process::async_read() {
   }
 }
 
-int Process::get_exit_status() {
+int TPL::Process::get_exit_status() {
   if(data.id<=0)
     return -1;
   int exit_status;
@@ -135,7 +137,7 @@ int Process::get_exit_status() {
   return exit_status;
 }
 
-void Process::close_fds() {
+void TPL::Process::close_fds() {
   if(stdout_thread.joinable())
     stdout_thread.join();
   if(stderr_thread.joinable())
@@ -155,9 +157,9 @@ void Process::close_fds() {
   }
 }
 
-bool Process::write(const char *bytes, size_t n) {
+bool TPL::Process::write(const char *bytes, size_t n) {
   if(!open_stdin)
-    throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
+    throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the TPL::Process.");
 
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
@@ -171,7 +173,7 @@ bool Process::write(const char *bytes, size_t n) {
   return false;
 }
 
-void Process::close_stdin() {
+void TPL::Process::close_stdin() {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     if(data.id>0)
@@ -180,7 +182,7 @@ void Process::close_stdin() {
   }
 }
 
-void Process::kill(bool force) {
+void TPL::Process::kill(bool force) {
   std::lock_guard<std::mutex> lock(close_mutex);
   if(data.id>0 && !closed) {
     if(force)
@@ -190,7 +192,7 @@ void Process::kill(bool force) {
   }
 }
 
-void Process::kill(id_type id, bool force) {
+void TPL::Process::kill(id_type id, bool force) {
   if(id<=0)
     return;
   if(force)

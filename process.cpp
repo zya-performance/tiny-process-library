@@ -1,6 +1,6 @@
 #include "process.hpp"
 
-Process::Process(const string_type &command, const string_type &path,
+TPL::Process::Process(const string_type &command, const string_type &path,
                  std::function<void(const char* bytes, size_t n)> read_stdout,
                  std::function<void(const char* bytes, size_t n)> read_stderr,
                  bool open_stdin, size_t buffer_size):
@@ -9,14 +9,14 @@ Process::Process(const string_type &command, const string_type &path,
   async_read();
 }
 
-Process::~Process() {
+TPL::Process::~Process() {
   close_fds();
 }
 
-Process::id_type Process::get_id() {
+TPL::Process::id_type TPL::Process::get_id() {
   return data.id;
 }
 
-bool Process::write(const std::string &data) {
+bool TPL::Process::write(const std::string &data) {
   return write(data.c_str(), data.size());
 }
